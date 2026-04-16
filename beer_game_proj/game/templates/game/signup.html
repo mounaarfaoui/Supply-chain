@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Signup</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(to right, #00b4d8, #0077b6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 300px;
+}
+
+h2 {
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #0077b6;
+    color: white;
+    border: none;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Créer un compte - {{ actor }}</h2>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Mot de passe" required>
+        <button type="submit">Créer</button>
+    </form>
+
+    <p style="text-align:center; margin-top:12px;"><a href="{% url 'auth_portal' %}">Retour au portail</a></p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Beer Game Global</title>
+
+<style>
+body {font-family: Arial; background:#f4f6f9;}
+.container {width:90%; margin:auto;}
+.grid {display:grid; grid-template-columns: repeat(5, 1fr); gap:20px;}
+.card {
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+}
+button {
+    padding:15px;
+    background:#0077b6;
+    color:white;
+    border:none;
+    width:100%;
+    margin-top:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🍺 Beer Game - Vue Globale</h1>
+
+{% if message %}
+<p style="color:green">{{ message }}</p>
+{% endif %}
+
+<div class="grid">
+
+<div class="card">
+<h3>Client</h3>
+<p>Demande : {{ data.client.demande }}</p>
+</div>
+
+<div class="card">
+<h3>Détaillant</h3>
+<p>Stock : {{ data.detaillant.stock }}</p>
+<p>Commande : {{ data.detaillant.commande }}</p>
+<p>Backlog : {{ data.detaillant.backlog }}</p>
+</div>
+
+<div class="card">
+<h3>Grossiste</h3>
+<p>Stock : {{ data.grossiste.stock }}</p>
+<p>Commande : {{ data.grossiste.commande }}</p>
+<p>Backlog : {{ data.grossiste.backlog }}</p>
+</div>
+
+<div class="card">
+<h3>Distributeur</h3>
+<p>Stock : {{ data.distributeur.stock }}</p>
+<p>Commande : {{ data.distributeur.commande }}</p>
+<p>Backlog : {{ data.distributeur.backlog }}</p>
+</div>
+
+<div class="card">
+<h3>Usine</h3>
+<p>Stock : {{ data.usine.stock }}</p>
+<p>Commande : {{ data.usine.commande }}</p>
+<p>Backlog : {{ data.usine.backlog }}</p>
+</div>
+
+</div>
+
+<form method="POST">
+{% csrf_token %}
+<button>▶️ Passer au tour suivant</button>
+</form>
+
+</div>
+
+</body>
+</html>

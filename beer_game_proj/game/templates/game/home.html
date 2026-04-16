@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beer Game - Supply Chain Simulator</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .turn-info {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .game-field {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        .supply-chain {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .actor-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .actor-box h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+        .actor-stat {
+            margin: 12px 0;
+            font-size: 0.95em;
+        }
+        .actor-stat strong {
+            display: block;
+            color: #ffd700;
+            font-size: 1.2em;
+            margin-top: 5px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        button, .btn {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+        .turn-history {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .turn-history h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .turn-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .turn-item {
+            padding: 10px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 10px;
+            background: #f7fafc;
+            border-radius: 4px;
+        }
+        .turn-item strong {
+            color: #667eea;
+        }
+        .game-ended {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.1em;
+            color: #7d6608;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: width 0.3s ease;
+        }
+        .messages {
+            margin-bottom: 20px;
+        }
+        .message-item {
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .message-item.error {
+            background: #ffe3e3;
+            color: #b42318;
+        }
+        .message-item.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .message-item.info,
+        .message-item.warning {
+            background: #e0ecff;
+            color: #1f4b99;
+        }
+        .order-form {
+            background: #f7fafc;
+            border: 1px solid #dbe3ef;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .order-form h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .order-help {
+            color: #4a5568;
+            margin-bottom: 16px;
+            font-size: 0.95em;
+        }
+        .order-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .order-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .order-field label {
+            font-weight: bold;
+            color: #334155;
+            font-size: 0.92em;
+        }
+        .order-field input {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 1em;
+        }
+        .order-field small {
+            color: #64748b;
+            font-size: 0.82em;
+        }
+        @media (max-width: 768px) {
+            .supply-chain {
+                flex-direction: column;
+            }
+            .actor-box {
+                width: 100%;
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🍺 Beer Game - Supply Chain Simulator</h1>
+    <p>Mode multi-joueurs: chaque acteur ne voit que sa propre decision.</p>
+</div>
+
+<div class="turn-info">
+    Room: <strong>{{ game.room_code }}</strong> |
+    Turn: <strong>{{ game.current_turn }}/{{ game.total_turns }}</strong>
+    {% if game.status == 'ended' %}
+        | Status: <strong style="color: #ffd700;">GAME ENDED</strong>
+    {% else %}
+        | Status: <strong>Active</strong>
+    {% endif %}
+</div>
+
+<div class="progress-bar">
+    <div class="progress-fill" style="width: {{ progress_percent|floatformat:0 }}%">
+        {{ progress_percent|floatformat:0 }}%
+    </div>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message-item {{ message.tags|default:'info' }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if game.status == 'ended' %}
+<div class="game-ended">
+    ✅ Game Complete! Check the dashboard for final statistics.
+</div>
+{% endif %}
+
+<div class="stats-container">
+    <div class="stat-card">
+        <h3>Votre role</h3>
+        <div class="stat-value">{{ actor.get_role_display }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Votre stock</h3>
+        <div class="stat-value">{{ stats.avg_stock }} units</div>
+    </div>
+    <div class="stat-card">
+        <h3>Votre backlog</h3>
+        <div class="stat-value">{{ stats.total_backlog }} units</div>
+    </div>
+    <div class="stat-card">
+        <h3>Soumissions du tour</h3>
+        <div class="stat-value">{{ submitted_count }}/{{ total_roles }}</div>
+    </div>
+</div>
+
+{% if game.status == 'active' and remaining_players > 0 %}
+<div class="game-ended" style="background:#eef6ff; border-left-color:#1d4ed8; color:#1e3a8a;">
+    En attente de {{ remaining_players }} joueur{% if remaining_players != 1 %}s{% endif %} avant de lancer le tour suivant.
+</div>
+{% endif %}
+
+<div class="game-field">
+    <h2 style="color: #667eea; margin-bottom: 20px;">Supply Chain State</h2>
+
+    {% if game.status == 'active' %}
+    <form method="post" action="{% url 'next_turn' %}" class="order-form">
+        {% csrf_token %}
+        <h3>Tour {{ pending_turn }} - {{ actor.get_role_display }}</h3>
+        <p class="order-help">Saisissez seulement votre decision. Les autres joueurs ne voient pas votre valeur.</p>
+
+        <div class="order-grid">
+            <div class="order-field">
+                <label for="order_{{ actor.role }}">
+                    {% if actor.role == 'client' %}
+                    Demande client
+                    {% elif actor.role == 'usine' %}
+                    Production
+                    {% else %}
+                    Commande
+                    {% endif %}
+                </label>
+                <input
+                    id="order_{{ actor.role }}"
+                    name="order_{{ actor.role }}"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="{{ actor.last_order }}"
+                    max="{{ actor.max_allowed }}"
+                    required
+                >
+                <small>Derniere valeur: {{ actor.last_order }}</small>
+                {% if actor.role == 'detaillant' %}
+                <small>Prevision statistique ({{ actor.demand_forecast_method }}, {{ actor.demand_forecast_window }} tour{% if actor.demand_forecast_window != 1 %}s{% endif %}): {{ actor.demand_forecast }}</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Passer au tour suivant</button>
+    </form>
+    {% endif %}
+    
+    <div class="supply-chain">
+        <div class="actor-box">
+            <h3>Votre acteur</h3>
+            <div class="actor-stat">
+                Stock
+                <strong>{{ actor.stock }}</strong>
+            </div>
+            <div class="actor-stat">
+                Backlog
+                <strong>{{ actor.backlog }}</strong>
+            </div>
+            <div class="actor-stat">
+                Cost
+                <strong>{{ actor.total_cost|floatformat:2 }} TND</strong>
+            </div>
+            <div class="actor-stat">
+                {% if actor.role == 'client' %}
+                Demand Decision
+                {% elif actor.role == 'usine' %}
+                Production Decision
+                {% else %}
+                Order Decision
+                {% endif %}
+                <strong>{{ actor.last_order }}</strong>
+            </div>
+            {% if actor.role != 'client' %}
+            <div class="actor-stat">
+                Delivery Decision
+                <strong>{{ actor.last_shipment_decision }}</strong>
+            </div>
+            {% endif %}
+            {% if actor.role == 'detaillant' %}
+            <div class="actor-stat">
+                Prevision statistique
+                <strong>{{ actor.demand_forecast }}</strong>
+                <small style="display:block; margin-top:6px; color: rgba(255,255,255,0.82); line-height: 1.4;">
+                    Methode: {{ actor.demand_forecast_method }} sur {{ actor.demand_forecast_window }} tour{% if actor.demand_forecast_window != 1 %}s{% endif %}<br>
+                    Historique recent:
+                    {% for item in actor.demand_history %}
+                        T{{ item.turn }}={{ item.demand }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Aucun tour encore
+                    {% endfor %}
+                </small>
+            </div>
+            {% endif %}
+            <div class="actor-stat" style="font-size: 0.85em; color: #ddd;">
+                In Transit: {{ actor.incoming_step_1 }}+{{ actor.incoming_step_2 }}
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        {% if user.is_superuser %}
+        <a href="{% url 'dashboard' %}" class="btn btn-info">📊 Dashboard</a>
+        {% endif %}
+        <a href="{% url 'game_room' %}" class="btn btn-info">👥 Salle de jeu</a>
+        <a href="{% url 'reset_game' %}" class="btn btn-danger">🔄 New Game</a>
+    </div>
+</div>
+
+<div class="turn-history">
+    <h3>Recent Turns</h3>
+    <div class="turn-list">
+        {% for turn in turns %}
+        <div class="turn-item">
+            <strong>Turn {{ turn.turn_number }}:</strong> Customer demand = {{ turn.customer_demand }} units
+        </div>
+        {% empty %}
+        <p style="color: #999;">No turns yet. Start the simulation!</p>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>

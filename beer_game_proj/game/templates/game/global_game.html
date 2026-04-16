@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beer Game</title>
+</head>
+<body>
+
+    <h1>🍺 Bienvenue dans le Beer Game</h1>
+
+    <!-- 🔘 Bouton Tour suivant -->
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">▶️ Tour suivant</button>
+    </form>
+
+    <hr>
+
+    <!-- 📊 Acteurs -->
+    <h2>Acteurs</h2>
+    <ul>
+        {% for actor in actors %}
+            <li>
+                <strong>{{ actor.name }}</strong> |
+                Stock: {{ actor.stock }} |
+                Backlog: {{ actor.backlog }} |
+                Coût: {{ actor.cost }}
+            </li>
+        {% empty %}
+            <li>Aucun acteur</li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <!-- 📦 Commandes -->
+    <h2>Commandes</h2>
+    <ul>
+        {% for order in orders %}
+            <li>
+                {{ order.actor.name }} → {{ order.quantity }} ({{ order.created_at }})
+            </li>
+        {% empty %}
+            <li>Aucune commande</li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
