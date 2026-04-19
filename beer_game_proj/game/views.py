@@ -103,6 +103,18 @@ def get_actor_for_role(game, role):
     return Actor.objects.filter(game=game, role=role).first()
 
 
+def find_user_for_identifier(identifier):
+    """Find a user by username or email, ignoring case."""
+    normalized = (identifier or "").strip()
+    if not normalized:
+        return None
+
+    user = User.objects.filter(username__iexact=normalized).first()
+    if user:
+        return user
+    return User.objects.filter(email__iexact=normalized).first()
+
+
 def get_demand(turn_number):
     """Generate variable customer demand with phase-based trend + randomness."""
     if turn_number <= 4:
@@ -354,18 +366,13 @@ def auth_portal(request):
     ensure_role_groups()
     game = get_or_create_game()
 
-    if request.user.is_authenticated:
-        return redirect("home")
-
     role_infos = []
     role_labels = dict(Actor.ROLE_CHOICES)
     for role in ROLE_ORDER:
-        role_user = User.objects.filter(groups__name=role).order_by("id").first()
         role_infos.append(
             {
                 "role": role,
                 "label": role_labels.get(role, role),
-                "has_account": role_user is not None,
             }
         )
 
@@ -382,27 +389,33 @@ def signup_role(request, role):
     actor_label = dict(Actor.ROLE_CHOICES).get(role, role)
     error = None
 
-    if User.objects.filter(groups__name=role).exists():
-        messages.info(request, f"Le role {actor_label} possede deja un compte. Utilisez la connexion.")
-        return redirect("login_role", role=role)
-
     if request.method == "POST":
         email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password", "").strip()
 
         if not email or not password:
             error = "Email et mot de passe obligatoires."
-        elif User.objects.filter(username=email).exists():
-            error = "Ce compte existe deja."
         else:
-            user = User.objects.create_user(username=email, email=email, password=password)
-            user.groups.clear()
-            user.groups.add(Group.objects.get(name=role))
-            login(request, user)
-            messages.success(request, f"Compte cree pour {actor_label}.")
-            return redirect("home")
+            existing_user = find_user_for_identifier(email)
 
-    return render(request, "game/signup.html", {"actor": actor_label, "error": error})
+            if existing_user is None:
+                user = User.objects.create_user(username=email, email=email, password=password)
+                user.groups.clear()
+                user.groups.add(Group.objects.get(name=role))
+                login(request, user)
+                messages.success(request, f"Compte cree pour {actor_label}.")
+                return redirect("home")
+
+            authenticated_user = authenticate(request, username=existing_user.username, password=password)
+            if authenticated_user is None:
+                error = "Creation impossible. Veuillez verifier votre email et votre mot de passe."
+            else:
+                authenticated_user.groups.add(Group.objects.get(name=role))
+                login(request, authenticated_user)
+                messages.success(request, f"Connexion effectuee pour {actor_label}.")
+                return redirect("home")
+
+    return render(request, "game/signup.html", {"actor": actor_label, "role": role, "error": error})
 
 
 def login_role(request, role):
@@ -418,16 +431,23 @@ def login_role(request, role):
     if request.method == "POST":
         email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password", "").strip()
-        user = authenticate(request, username=email, password=password)
+        user = find_user_for_identifier(email)
 
-        if user is None:
-            error = "Identifiants invalides."
-        elif not user.groups.filter(name=role).exists():
-            error = f"Ce compte n'appartient pas au role {actor_label}."
+        if not email or not password:
+            error = "Email et mot de passe obligatoires."
+        elif user is None:
+            error = "Aucun compte trouve pour cet email."
         else:
-            login(request, user)
-            messages.success(request, f"Connecte en tant que {actor_label}.")
-            return redirect("home")
+            user = authenticate(request, username=user.username, password=password)
+
+            if user is None:
+                error = "Mot de passe incorrect."
+            elif not user.groups.filter(name=role).exists():
+                error = f"Ce compte n'appartient pas au role {actor_label}."
+            else:
+                login(request, user)
+                messages.success(request, f"Connecte en tant que {actor_label}.")
+                return redirect("home")
 
     return render(request, "game/login.html", {"actor": actor_label, "error": error})
 

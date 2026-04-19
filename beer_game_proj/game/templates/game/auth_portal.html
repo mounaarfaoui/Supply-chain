@@ -4,67 +4,145 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Beer Game - Portail Joueurs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --malt: #d18f2a;
+            --hops: #4a7b3d;
+            --foam: #fff9ea;
+            --oak: #402515;
+            --cream: #f5e7c8;
+            --ink: #1f1a17;
+        }
         body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Barlow", sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1f4b99 0%, #2e7d32 100%);
+            overflow-x: hidden;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 248, 220, 0.45) 0 130px, transparent 132px),
+                radial-gradient(circle at 85% 15%, rgba(242, 180, 77, 0.30) 0 110px, transparent 112px),
+                linear-gradient(130deg, #5e3a1f 0%, #9a5f23 45%, #c98526 100%);
             padding: 24px;
-            color: #0f172a;
+            color: var(--ink);
+        }
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: auto;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::before {
+            width: 280px;
+            height: 280px;
+            right: -60px;
+            top: 40px;
+            background:
+                radial-gradient(circle at 50% 62%, rgba(255, 210, 120, 0.95) 0 80px, transparent 82px),
+                radial-gradient(circle at 50% 40%, rgba(255, 245, 220, 0.95) 0 18px, transparent 20px),
+                linear-gradient(180deg, rgba(255,255,255,0.12) 0 0);
+            border: 8px solid rgba(255, 248, 235, 0.35);
+            border-radius: 40px 40px 28px 28px;
+            box-shadow: inset 0 -18px 0 rgba(128, 74, 28, 0.18), 0 20px 40px rgba(20, 12, 6, 0.18);
+            transform: rotate(8deg);
+            animation: floatMug 6s ease-in-out infinite;
+        }
+        body::after {
+            width: 220px;
+            height: 220px;
+            left: -60px;
+            bottom: 20px;
+            background:
+                radial-gradient(circle at 50% 55%, rgba(255, 227, 150, 0.24) 0 18px, transparent 20px),
+                radial-gradient(circle at 30% 35%, rgba(255, 255, 255, 0.25) 0 9px, transparent 11px),
+                radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.18) 0 7px, transparent 9px),
+                radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.16) 0 6px, transparent 8px);
+            filter: blur(1px);
+            animation: bubbles 9s linear infinite;
         }
         .container {
-            max-width: 980px;
+            max-width: 1120px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
         .header {
             text-align: center;
-            color: #fff;
-            margin-bottom: 24px;
+            color: #fff7e5;
+            margin-bottom: 26px;
         }
-        .header h1 { font-size: 2.1rem; margin-bottom: 8px; }
-        .header p { opacity: 0.92; }
+        .header h1 {
+            font-family: "Bree Serif", serif;
+            font-size: clamp(1.9rem, 4vw, 2.9rem);
+            margin-bottom: 10px;
+            letter-spacing: 0.03em;
+        }
+        .header p { opacity: 0.95; font-size: 1.05rem; }
         .card {
-            background: #fff;
-            border-radius: 14px;
-            padding: 24px;
-            box-shadow: 0 14px 28px rgba(0,0,0,0.16);
+            background: linear-gradient(180deg, #fff9ec 0%, #f8ecd4 100%);
+            border-radius: 18px;
+            padding: 26px;
+            border: 1px solid rgba(64, 37, 21, 0.18);
+            box-shadow: 0 22px 42px rgba(31, 19, 10, 0.26);
+            animation: cardDrift 8s ease-in-out infinite;
         }
         .roles {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 14px;
-            margin-top: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-top: 18px;
         }
         .role-box {
-            border: 1px solid #dbe3ef;
-            border-radius: 10px;
-            padding: 14px;
-            background: #f8fafc;
+            border: 1px solid rgba(64, 37, 21, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            background: var(--foam);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            animation: tileBreathe 7s ease-in-out infinite;
         }
-        .role-box h3 { color: #1f4b99; margin-bottom: 10px; font-size: 1.05rem; }
-        .role-note {
-            font-size: 0.85rem;
+        .role-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(64, 37, 21, 0.18);
+        }
+        .role-box h3 {
+            color: var(--oak);
             margin-bottom: 10px;
-            color: #475569;
+            font-family: "Bree Serif", serif;
+            font-size: 1.08rem;
         }
-        .role-note.busy {
-            color: #9a3412;
-            font-weight: 700;
+        .role-note {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: #5f3d24;
         }
         .actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn {
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             text-decoration: none;
             font-weight: 700;
-            padding: 9px 12px;
+            padding: 10px 14px;
             display: inline-block;
-            font-size: 0.92rem;
+            font-size: 0.93rem;
             cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
         }
-        .btn-login { background: #1f4b99; color: #fff; }
-        .btn-signup { background: #2e7d32; color: #fff; }
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.04);
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #8f551f 0%, #6e3f17 100%);
+            color: #fff;
+        }
+        .btn-signup {
+            background: linear-gradient(135deg, #5f8d3f 0%, #3f6f2f 100%);
+            color: #fff;
+        }
         .messages { margin-bottom: 14px; }
         .msg {
             padding: 10px 12px;
@@ -74,21 +152,101 @@
         }
         .msg.error { background: #ffe3e3; color: #b42318; }
         .msg.success { background: #dcfce7; color: #166534; }
-        .msg.info, .msg.warning { background: #e0ecff; color: #1f4b99; }
+        .msg.info, .msg.warning { background: #fff5dd; color: #8a4b14; }
+        .hero-note {
+            background: linear-gradient(135deg, #efe0bd 0%, #f8eed7 100%);
+            border: 1px solid rgba(64, 37, 21, 0.16);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        .room-code {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--oak);
+            letter-spacing: 0.12em;
+            margin-top: 4px;
+        }
+        .brand-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+        .beer-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px 18px 14px 14px;
+            position: relative;
+            background: linear-gradient(180deg, rgba(255,255,255,0.95) 0 12px, rgba(255, 214, 110, 0.95) 12px 46px, rgba(203, 132, 42, 0.95) 46px 100%);
+            border: 4px solid rgba(255, 248, 235, 0.7);
+            box-shadow: inset 0 -6px 0 rgba(97, 57, 18, 0.18);
+            animation: mugBob 5s ease-in-out infinite;
+        }
+        .beer-icon::before {
+            content: "";
+            position: absolute;
+            right: -10px;
+            top: 14px;
+            width: 16px;
+            height: 24px;
+            border: 4px solid rgba(255, 248, 235, 0.85);
+            border-left: none;
+            border-radius: 0 14px 14px 0;
+        }
+        .beer-icon::after {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 14px 6px 0 rgba(255,255,255,0.75), 8px 20px 0 rgba(255,255,255,0.65);
+        }
+        @keyframes floatMug {
+            0%, 100% { transform: rotate(8deg) translateY(0); }
+            50% { transform: rotate(6deg) translateY(-18px); }
+        }
+        @keyframes bubbles {
+            0% { transform: translateY(30px) translateX(0); opacity: 0.25; }
+            50% { transform: translateY(-20px) translateX(10px); opacity: 0.7; }
+            100% { transform: translateY(-70px) translateX(0); opacity: 0.2; }
+        }
+        @keyframes cardDrift {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        @keyframes tileBreathe {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+        @keyframes mugBob {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(-2deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>Beer Game - Portail des Joueurs</h1>
+        <div class="brand-line">
+            <div class="beer-icon" aria-hidden="true"></div>
+            <h1>Beer Game - Taproom des Joueurs</h1>
+        </div>
         <p>Chaque joueur choisit un role et ne voit que ses propres decisions.</p>
     </div>
 
     <div class="card">
-        <div class="role-box" style="margin-bottom:16px; background:#eef6ff; border-color:#bfd7ff;">
+        <div class="hero-note">
             <h3>Code de salle</h3>
-            <div class="role-note">Partage ce code avec tes amis pour rejoindre la meme partie.</div>
-            <div style="font-size:1.4rem; font-weight:800; color:#1f4b99; letter-spacing:0.12em;">{{ game.room_code }}</div>
+            <div class="role-note">Partage ce code pour rejoindre exactement la meme partie.</div>
+            <div class="room-code">{{ game.room_code }}</div>
         </div>
 
         {% if messages %}
@@ -104,16 +262,10 @@
             {% for item in role_infos %}
             <div class="role-box">
                 <h3>{{ item.label }}</h3>
-                {% if item.has_account %}
-                <div class="role-note busy">Compte deja cree pour ce role</div>
-                {% else %}
-                <div class="role-note">Aucun compte cree pour ce role</div>
-                {% endif %}
+                <div class="role-note">Choisissez Connexion ou Inscription pour ce role.</div>
                 <div class="actions">
                     <a class="btn btn-login" href="{% url 'login_role' item.role %}">Connexion</a>
-                    {% if not item.has_account %}
                     <a class="btn btn-signup" href="{% url 'signup_role' item.role %}">Inscription</a>
-                    {% endif %}
                 </div>
             </div>
             {% endfor %}

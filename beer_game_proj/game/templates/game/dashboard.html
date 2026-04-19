@@ -5,24 +5,36 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --oak: #4a2c17;
+            --malt: #c78124;
+            --hops: #4f7f3a;
+            --foam: #fff9eb;
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: "Barlow", sans-serif;
+            background:
+                radial-gradient(circle at 15% 12%, rgba(255, 244, 212, 0.28) 0 160px, transparent 162px),
+                linear-gradient(140deg, #5f3b1f 0%, #9a5f23 45%, #cb8729 100%);
             min-height: 100vh;
             padding: 20px;
         }
         .header {
             text-align: center;
-            color: white;
+            color: #fff8e9;
             margin-bottom: 30px;
         }
         .header h1 {
+            font-family: "Bree Serif", serif;
             font-size: 2.2em;
             margin-bottom: 10px;
         }
@@ -43,12 +55,12 @@
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
-            background: white;
-            color: #667eea;
+            background: #f4e6c3;
+            color: #5e3a1e;
         }
         a:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 14px rgba(41, 24, 13, 0.22);
         }
         .dashboard-container {
             display: grid;
@@ -57,13 +69,14 @@
             margin-bottom: 30px;
         }
         .chart-card {
-            background: white;
+            background: linear-gradient(180deg, #fff9ee 0%, #f6e9ca 100%);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(74, 44, 23, 0.16);
+            box-shadow: 0 10px 18px rgba(37, 22, 12, 0.2);
         }
         .chart-card h3 {
-            color: #667eea;
+            color: #6a4320;
             margin-bottom: 15px;
             font-size: 1.2em;
         }
@@ -73,7 +86,7 @@
             margin-top: 20px;
         }
         .stats-table th {
-            background: #667eea;
+            background: linear-gradient(135deg, #7f4a1d 0%, #5f3614 100%);
             color: white;
             padding: 12px;
             text-align: left;
@@ -81,21 +94,22 @@
         }
         .stats-table td {
             padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e5d8bc;
         }
         .stats-table tr:hover {
-            background: #f7fafc;
+            background: #fff3dd;
         }
         .actor-section {
-            background: white;
+            background: linear-gradient(180deg, #fff9ee 0%, #f6e9ca 100%);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(74, 44, 23, 0.16);
+            box-shadow: 0 10px 18px rgba(37, 22, 12, 0.2);
             margin-bottom: 20px;
         }
         .actor-section h2 {
-            color: #667eea;
-            border-bottom: 2px solid #667eea;
+            color: #6b4421;
+            border-bottom: 2px solid #8d5625;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
@@ -105,23 +119,23 @@
             font-size: 0.9em;
         }
         .detail-table th {
-            background: #f0f4ff;
-            color: #667eea;
+            background: #f4e6c4;
+            color: #6d4622;
             padding: 10px;
             text-align: left;
             font-weight: bold;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid #8d5625;
         }
         .detail-table td {
             padding: 10px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e5d8bc;
         }
         .detail-table tr:hover {
-            background: #f7fafc;
+            background: #fff3dd;
         }
         .stat-highlight {
-            background: #fef5e7;
-            color: #7d6608;
+            background: #fff0cb;
+            color: #7a4b1f;
             padding: 8px 12px;
             border-radius: 4px;
             font-weight: bold;

@@ -2,24 +2,55 @@
 <html>
 <head>
 <title>Beer Game Global</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
 
 <style>
-body {font-family: Arial; background:#f4f6f9;}
-.container {width:90%; margin:auto;}
-.grid {display:grid; grid-template-columns: repeat(5, 1fr); gap:20px;}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: "Barlow", sans-serif;
+    background:
+        radial-gradient(circle at 15% 15%, rgba(255, 246, 217, 0.3) 0 140px, transparent 142px),
+        linear-gradient(140deg, #5f3a1f 0%, #9a5f23 48%, #cb8829 100%);
+    min-height: 100vh;
+    color: #24180f;
+    padding: 24px;
+}
+.container {width: min(1200px, 100%); margin: 0 auto;}
+h1 {
+    font-family: "Bree Serif", serif;
+    color: #fff8e9;
+    font-size: clamp(1.8rem, 4vw, 2.7rem);
+    margin-bottom: 16px;
+}
+.grid {display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:16px;}
 .card {
-    background:white;
+    background: linear-gradient(180deg, #fff9ee 0%, #f6e9ca 100%);
     padding:20px;
-    border-radius:10px;
+    border-radius:12px;
     text-align:center;
+    border: 1px solid rgba(74, 44, 23, 0.16);
+    box-shadow: 0 10px 18px rgba(37, 22, 12, 0.2);
+}
+.card h3 {
+    font-family: "Bree Serif", serif;
+    color: #6b4320;
+    margin-top: 0;
 }
 button {
-    padding:15px;
-    background:#0077b6;
+    padding:14px;
+    background: linear-gradient(135deg, #7f4a1d 0%, #5f3614 100%);
     color:white;
     border:none;
     width:100%;
     margin-top:20px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
 }
 </style>
 
@@ -32,7 +63,7 @@ button {
 <h1>🍺 Beer Game - Vue Globale</h1>
 
 {% if message %}
-<p style="color:green">{{ message }}</p>
+<p style="color:#1f5a22; font-weight:700; margin-bottom:12px;">{{ message }}</p>
 {% endif %}
 
 <div class="grid">

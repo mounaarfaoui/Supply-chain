@@ -2,20 +2,73 @@
 <html>
 <head>
     <title>Beer Game</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Barlow", sans-serif;
+            background:
+                radial-gradient(circle at 84% 12%, rgba(255, 244, 212, 0.3) 0 120px, transparent 122px),
+                linear-gradient(140deg, #5f3a1f 0%, #9a5f23 46%, #cc8829 100%);
+            min-height: 100vh;
+            color: #23170f;
+            padding: 24px;
+        }
+        .wrap {
+            width: min(980px, 100%);
+            margin: 0 auto;
+        }
+        h1 {
+            color: #fff8e9;
+            font-family: "Bree Serif", serif;
+            margin-bottom: 16px;
+            font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+        }
+        .panel {
+            background: linear-gradient(180deg, #fff9ee 0%, #f6e9ca 100%);
+            border: 1px solid rgba(74, 44, 23, 0.16);
+            border-radius: 12px;
+            box-shadow: 0 10px 18px rgba(37, 22, 12, 0.2);
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #6b4320;
+            font-family: "Bree Serif", serif;
+        }
+        ul { margin: 0; padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        button {
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7f4a1d 0%, #5f3614 100%);
+            color: #fff;
+            padding: 12px 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
+    <div class="wrap">
+
     <h1>🍺 Bienvenue dans le Beer Game</h1>
 
-    <!-- 🔘 Bouton Tour suivant -->
+    <div class="panel">
     <form method="POST">
         {% csrf_token %}
         <button type="submit">▶️ Tour suivant</button>
     </form>
+    </div>
 
-    <hr>
-
-    <!-- 📊 Acteurs -->
+    <div class="panel">
     <h2>Acteurs</h2>
     <ul>
         {% for actor in actors %}
@@ -29,10 +82,9 @@
             <li>Aucun acteur</li>
         {% endfor %}
     </ul>
+    </div>
 
-    <hr>
-
-    <!-- 📦 Commandes -->
+    <div class="panel">
     <h2>Commandes</h2>
     <ul>
         {% for order in orders %}
@@ -43,6 +95,9 @@
             <li>Aucune commande</li>
         {% endfor %}
     </ul>
+    </div>
+
+    </div>
 
 </body>
 </html>

@@ -4,34 +4,91 @@
     <title>Beer Game - Supply Chain Simulator</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --oak: #4a2c17;
+            --malt: #c88023;
+            --hops: #4f7f3a;
+            --foam: #fff9ea;
+            --paper: #f7ecd1;
+            --ink: #23170f;
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: "Barlow", sans-serif;
+            overflow-x: hidden;
+            background:
+                radial-gradient(circle at 85% 10%, rgba(255, 244, 213, 0.3) 0 150px, transparent 152px),
+                radial-gradient(circle at 15% 80%, rgba(248, 197, 117, 0.22) 0 170px, transparent 172px),
+                linear-gradient(140deg, #5f3a1f 0%, #9b5f23 46%, #cd892a 100%);
             min-height: 100vh;
             padding: 20px;
+            color: var(--ink);
+        }
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::before {
+            width: 320px;
+            height: 320px;
+            right: -70px;
+            top: 110px;
+            background:
+                radial-gradient(circle at 50% 58%, rgba(255, 220, 120, 0.95) 0 95px, transparent 97px),
+                radial-gradient(circle at 50% 36%, rgba(255, 247, 230, 0.95) 0 20px, transparent 22px),
+                linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0));
+            border: 9px solid rgba(255, 246, 228, 0.34);
+            border-radius: 42px 42px 30px 30px;
+            box-shadow: inset 0 -22px 0 rgba(120, 71, 24, 0.18), 0 20px 44px rgba(24, 15, 8, 0.18);
+            transform: rotate(6deg);
+            animation: mugFloat 7s ease-in-out infinite;
+        }
+        body::after {
+            width: 220px;
+            height: 220px;
+            left: -50px;
+            bottom: 40px;
+            background:
+                radial-gradient(circle at 25% 28%, rgba(255,255,255,0.24) 0 7px, transparent 9px),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18) 0 8px, transparent 10px),
+                radial-gradient(circle at 70% 20%, rgba(255,255,255,0.22) 0 6px, transparent 8px),
+                radial-gradient(circle at 65% 72%, rgba(255,255,255,0.14) 0 7px, transparent 9px);
+            animation: bubblesUp 10s linear infinite;
+        }
+        .page-shell {
+            position: relative;
+            z-index: 1;
         }
         .header {
             text-align: center;
-            color: white;
+            color: #fff8e9;
             margin-bottom: 30px;
         }
         .header h1 {
-            font-size: 2.5em;
+            font-family: "Bree Serif", serif;
+            font-size: clamp(1.9rem, 4vw, 2.8rem);
             margin-bottom: 10px;
         }
         .turn-info {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 249, 235, 0.22);
+            border: 1px solid rgba(255, 237, 198, 0.55);
             padding: 15px;
             border-radius: 10px;
-            color: white;
+            color: #fff8e9;
             font-size: 1.1em;
             margin-bottom: 20px;
+            backdrop-filter: blur(2px);
         }
         .stats-container {
             display: grid;
@@ -40,14 +97,16 @@
             margin-bottom: 30px;
         }
         .stat-card {
-            background: white;
+            background: linear-gradient(180deg, #fff9ee 0%, #f7ebd0 100%);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(74, 44, 23, 0.15);
+            box-shadow: 0 8px 18px rgba(37, 22, 12, 0.2);
             text-align: center;
+            animation: cardFloat 6s ease-in-out infinite;
         }
         .stat-card h3 {
-            color: #667eea;
+            color: #6a4320;
             font-size: 0.9em;
             text-transform: uppercase;
             margin-bottom: 10px;
@@ -55,13 +114,14 @@
         .stat-value {
             font-size: 2em;
             font-weight: bold;
-            color: #333;
+            color: #3f2818;
         }
         .game-field {
-            background: white;
+            background: linear-gradient(180deg, #fff9ee 0%, #f6e9ca 100%);
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 16px;
+            border: 1px solid rgba(74, 44, 23, 0.17);
+            box-shadow: 0 16px 30px rgba(36, 22, 12, 0.24);
             margin-bottom: 30px;
         }
         .supply-chain {
@@ -73,13 +133,14 @@
             gap: 20px;
         }
         .actor-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(145deg, #855021 0%, #5f3615 100%);
+            color: #fff9ea;
             padding: 20px;
             border-radius: 10px;
             width: 200px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 18px rgba(40, 22, 11, 0.25);
+            animation: actorPulse 7s ease-in-out infinite;
         }
         .actor-box h3 {
             font-size: 1.3em;
@@ -93,7 +154,7 @@
         }
         .actor-stat strong {
             display: block;
-            color: #ffd700;
+            color: #ffe08a;
             font-size: 1.2em;
             margin-top: 5px;
         }
@@ -116,46 +177,55 @@
             display: inline-block;
         }
         .btn-primary {
-            background: #667eea;
+            background: linear-gradient(135deg, #7f4a1d 0%, #5f3615 100%);
             color: white;
         }
         .btn-primary:hover {
-            background: #5568d3;
+            background: linear-gradient(135deg, #8a5322 0%, #683b17 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 12px rgba(74, 44, 23, 0.28);
         }
         .btn-success {
-            background: #48bb78;
+            background: linear-gradient(135deg, #5b8a3a 0%, #40682d 100%);
             color: white;
         }
         .btn-success:hover {
-            background: #38a169;
+            background: linear-gradient(135deg, #639540 0%, #487632 100%);
             transform: translateY(-2px);
         }
         .btn-danger {
-            background: #f56565;
+            background: linear-gradient(135deg, #c85f2f 0%, #a1421e 100%);
             color: white;
         }
         .btn-danger:hover {
-            background: #e53e3e;
+            background: linear-gradient(135deg, #d06a35 0%, #b14c23 100%);
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #e0a32a 0%, #bb7c17 100%);
+            color: white;
+        }
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #eab038 0%, #c7891d 100%);
             transform: translateY(-2px);
         }
         .btn-info {
-            background: #4299e1;
+            background: linear-gradient(135deg, #5f8b3b 0%, #43682d 100%);
             color: white;
         }
         .btn-info:hover {
-            background: #3182ce;
+            background: linear-gradient(135deg, #6a9a43 0%, #4c7632 100%);
             transform: translateY(-2px);
         }
         .turn-history {
-            background: white;
+            background: linear-gradient(180deg, #fff9ee 0%, #f6e9ca 100%);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(74, 44, 23, 0.16);
+            box-shadow: 0 8px 18px rgba(37, 22, 12, 0.2);
         }
         .turn-history h3 {
-            color: #667eea;
+            color: #6d4622;
             margin-bottom: 15px;
         }
         .turn-list {
@@ -164,35 +234,36 @@
         }
         .turn-item {
             padding: 10px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #8a5322;
             margin-bottom: 10px;
-            background: #f7fafc;
+            background: #fff5e0;
             border-radius: 4px;
+            animation: itemSlide 0.5s ease both;
         }
         .turn-item strong {
-            color: #667eea;
+            color: #7a4a20;
         }
         .game-ended {
-            background: #fef5e7;
-            border-left: 4px solid #f39c12;
+            background: #fff3d8;
+            border-left: 4px solid #c67a1f;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
             text-align: center;
             font-size: 1.1em;
-            color: #7d6608;
+            color: #77441a;
         }
         .progress-bar {
             width: 100%;
             height: 30px;
-            background: #e0e0e0;
+            background: #e7d8b8;
             border-radius: 15px;
             overflow: hidden;
             margin-bottom: 15px;
         }
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, #6a9a44 0%, #c67d21 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -220,22 +291,22 @@
         }
         .message-item.info,
         .message-item.warning {
-            background: #e0ecff;
-            color: #1f4b99;
+            background: #fff3d8;
+            color: #7a4a20;
         }
         .order-form {
-            background: #f7fafc;
-            border: 1px solid #dbe3ef;
+            background: #fff4dd;
+            border: 1px solid #e2cda1;
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 24px;
         }
         .order-form h3 {
-            color: #667eea;
+            color: #6a4320;
             margin-bottom: 8px;
         }
         .order-help {
-            color: #4a5568;
+            color: #6a4a2d;
             margin-bottom: 16px;
             font-size: 0.95em;
         }
@@ -252,18 +323,19 @@
         }
         .order-field label {
             font-weight: bold;
-            color: #334155;
+            color: #51351f;
             font-size: 0.92em;
         }
         .order-field input {
             width: 100%;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #d7be8b;
             border-radius: 8px;
             padding: 10px;
             font-size: 1em;
+            background: #fffef9;
         }
         .order-field small {
-            color: #64748b;
+            color: #6c4e31;
             font-size: 0.82em;
         }
         @media (max-width: 768px) {
@@ -277,10 +349,34 @@
                 font-size: 1.8em;
             }
         }
+        @keyframes mugFloat {
+            0%, 100% { transform: rotate(6deg) translateY(0); }
+            50% { transform: rotate(4deg) translateY(-16px); }
+        }
+        @keyframes bubblesUp {
+            0% { transform: translateY(20px); opacity: 0.25; }
+            50% { transform: translateY(-20px); opacity: 0.7; }
+            100% { transform: translateY(-70px); opacity: 0.2; }
+        }
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        @keyframes actorPulse {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes itemSlide {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
     </style>
 </head>
 <body>
-
+<div class="page-shell">
 <div class="header">
     <h1>🍺 Beer Game - Supply Chain Simulator</h1>
     <p>Mode multi-joueurs: chaque acteur ne voit que sa propre decision.</p>
@@ -440,6 +536,7 @@
         {% endif %}
         <a href="{% url 'game_room' %}" class="btn btn-info">👥 Salle de jeu</a>
         <a href="{% url 'reset_game' %}" class="btn btn-danger">🔄 New Game</a>
+        <a href="{% url 'logout' %}" class="btn btn-warning">🚪 Quitter le jeu</a>
     </div>
 </div>
 
@@ -454,6 +551,8 @@
         <p style="color: #999;">No turns yet. Start the simulation!</p>
         {% endfor %}
     </div>
+</div>
+
 </div>
 
 </body>
